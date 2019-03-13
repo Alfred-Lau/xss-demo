@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  {# <META HTTP-EQUIV="refresh" CONTENT="0;url=javascript:alert('XSS');"> #}
+  {# <META HTTP-EQUIV="refresh" CONTENT="0;url=data:text/html base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K"> #}
+  {# <META HTTP-EQUIV="refresh" CONTENT="0; URL=http://;URL=javascript:alert('XSS');"> #}
+  <title>2-59</title>
+</head>
+<body>
+{# ¼script¾alert(¢XSS¢)¼/script¾ #}
+  均测试无效
+</body>
+</html>
